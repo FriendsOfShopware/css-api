@@ -1,0 +1,5 @@
+name = "css-minify"
+main = "src/index.ts"
+compatibility_date = "2022-10-16"
+routes = ["css-api.fos.gg/*"]
+workers_dev = false

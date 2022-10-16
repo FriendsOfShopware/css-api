@@ -1,0 +1,6 @@
+POST https://css-api.fos.gg/prefix
+Content-Type: application/json
+
+{
+    "code": "body { -webkit-border-radius: 2px; -moz-border-radius: 2px; border-radius: 2px; }"
+}
