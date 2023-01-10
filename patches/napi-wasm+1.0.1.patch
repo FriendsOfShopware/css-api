@@ -1,0 +1,15 @@
+diff --git a/node_modules/napi-wasm/index.mjs b/node_modules/napi-wasm/index.mjs
+index 035189a..cf1d7c5 100644
+--- a/node_modules/napi-wasm/index.mjs
++++ b/node_modules/napi-wasm/index.mjs
+@@ -25,6 +25,10 @@ const typedArrays = [
+   BigUint64Array
+ ];
+ 
++class FinalizationRegistry {
++  register() {}
++}
++
+ const environments = [];
+ 
+ export class Environment {
