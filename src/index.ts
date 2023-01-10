@@ -62,12 +62,6 @@ async function prefix(request: Request): Promise<Response> {
 
   delete json.code;
 
-  // const instance = await WebAssembly.instantiate(localWASM, {
-  //   env: napi,
-  // });
-
-  // let env = new Environment(instance);
-
   let res;
   try {
     res = lightningcss.transform({ ...defaultOptions, ...json });
