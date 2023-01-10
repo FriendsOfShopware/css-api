@@ -1,4 +1,4 @@
-import localWASM from './node_modules/lightningcss/dist/lightningcss.wasm';
+import localWASM from '../node_modules/lightningcss-wasm/lightningcss_node.wasm';
 import { Environment, napi } from 'napi-wasm';
 
 let enc = new TextEncoder();
@@ -62,9 +62,15 @@ async function prefix(request: Request): Promise<Response> {
 
   delete json.code;
 
+  const instance = await WebAssembly.instantiate(localWASM, {
+    env: napi,
+  });
+
+  let env = new Environment(instance);
+
   let res;
   try {
-    res = lightningcss.transform({ ...defaultOptions, ...json });
+    res = env.exports.transform({ ...defaultOptions, ...json });
   } catch (e) {
     return new JsonResponse('Cannot process css failed with: ' + e.toString(), 500);
   }
