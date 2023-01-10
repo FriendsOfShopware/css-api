@@ -1,8 +1,8 @@
-import * as localWasm from './lightningcss_node.js';
+import localWASM from './node_modules/lightningcss/dist/lightningcss.wasm';
+import { Environment, napi } from 'napi-wasm';
 
 let enc = new TextEncoder();
 let dec = new TextDecoder();
-let loaded = 0
 
 class JsonResponse extends Response {
   constructor(obj: any, statusCode: number) {
@@ -25,6 +25,7 @@ export default {
             'location': 'https://github.com/FriendsOfShopware/css-api'
           }
         })
+      case '/minify':
       case '/prefix':
         return await prefix(request);
       default:
@@ -61,14 +62,15 @@ async function prefix(request: Request): Promise<Response> {
 
   delete json.code;
 
-  if (loaded === 0) {
-    await localWasm.default()
-    loaded = 1;
-  }
+  // const instance = await WebAssembly.instantiate(localWASM, {
+  //   env: napi,
+  // });
+
+  // let env = new Environment(instance);
 
   let res;
   try {
-    res = localWasm.transform({ ...defaultOptions, ...json });
+    res = lightningcss.transform({ ...defaultOptions, ...json });
   } catch (e) {
     return new JsonResponse('Cannot process css failed with: ' + e.toString(), 500);
   }

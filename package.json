@@ -1,5 +1,5 @@
 {
-  "name": "foo",
+  "name": "lightningcss",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,5 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lightningcss-wasm": "^1.18.0",
+    "napi-wasm": "^1.0.1",
+    "wrangler": "^2.7.1"
+  }
 }
