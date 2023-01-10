@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    concurrency: 'api-deploy'
+    steps:
+    - uses: actions/checkout@v3
+    - name: NPM Install
+      run: |
+        npm install
+    - name: Publish API
+      uses: cloudflare/wrangler-action@2.0.0
+      with:
+        apiToken: ${{ secrets.CF_API_TOKEN }}
+        accountId: ${{ secrets.CF_ACCOUNT_ID }}
+        command: 'publish'
