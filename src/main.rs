@@ -1,5 +1,5 @@
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
-use lightningcss::stylesheet::{StyleSheet, ParserOptions, PrinterOptions};
+use lightningcss::stylesheet::{StyleSheet, ParserOptions, PrinterOptions, MinifyOptions};
 use serde::{Deserialize};
 use lightningcss::targets::Browsers;
 use serde_json::json;
@@ -74,10 +74,13 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
                 .expect("failed to render response"));
         }
 
+
+        let mut minify_options = MinifyOptions::default();
         let mut printer_options = PrinterOptions::default();
 
         if request.browserlist.is_empty() {
             printer_options.targets = Some(request.targets);
+            minify_options.targets = Some(request.targets);
         } else {
             let browser_list = Browsers::from_browserslist([&request.browserlist]);
 
@@ -91,12 +94,19 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
                     .expect("failed to render response"));
             }
 
-            printer_options.targets = browser_list.unwrap();
+            let browser_list = browser_list.unwrap();
+
+            printer_options.targets = browser_list;
+            minify_options.targets = browser_list;
         }
+
+        let mut stylesheet_unwrapped = stylesheet.unwrap();
+
+        stylesheet_unwrapped.minify(minify_options).unwrap();
 
         printer_options.minify = request.minify;
 
-        let build = stylesheet.unwrap().to_css(printer_options);
+        let build = stylesheet_unwrapped.to_css(printer_options);
 
         if build.is_err() {
             return Ok(Response::builder()
