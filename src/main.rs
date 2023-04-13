@@ -1,7 +1,7 @@
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
-use lightningcss::stylesheet::{StyleSheet, ParserOptions, PrinterOptions, MinifyOptions};
-use serde::{Deserialize};
+use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
 use lightningcss::targets::Browsers;
+use serde::Deserialize;
 use serde_json::json;
 
 #[inline]
@@ -34,9 +34,13 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
         return Ok(Response::builder()
             .status(405)
             .header("Content-Type", "application/json")
-            .body(json!( {
-                "message": "Method not allowed"
-            }).to_string().into())
+            .body(
+                json!( {
+                    "message": "Method not allowed"
+                })
+                .to_string()
+                .into(),
+            )
             .expect("failed to render response"));
     }
 
@@ -47,9 +51,13 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
             return Ok(Response::builder()
                 .status(400)
                 .header("Content-Type", "application/json")
-                .body(json!( {
-                    "message": "Invalid content-type given"
-                }).to_string().into())
+                .body(
+                    json!( {
+                        "message": "Invalid content-type given"
+                    })
+                    .to_string()
+                    .into(),
+                )
                 .expect("failed to render response"));
         }
     };
@@ -59,21 +67,21 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
         parser_options.custom_media = request.custom_media_queries;
         parser_options.nesting = request.css_nesting;
 
-        let stylesheet = StyleSheet::parse(
-            &request.stylesheet,
-            parser_options
-        );
+        let stylesheet = StyleSheet::parse(&request.stylesheet, parser_options);
 
         if let Err(err) = stylesheet {
             return Ok(Response::builder()
                 .status(400)
                 .header("Content-Type", "application/json")
-                .body(json!( {
-                    "message": err.to_string()
-                }).to_string().into())
+                .body(
+                    json!( {
+                        "message": err.to_string()
+                    })
+                    .to_string()
+                    .into(),
+                )
                 .expect("failed to render response"));
         }
-
 
         let mut minify_options = MinifyOptions::default();
         let mut printer_options = PrinterOptions::default();
@@ -88,9 +96,13 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
                 return Ok(Response::builder()
                     .status(400)
                     .header("Content-Type", "application/json")
-                    .body(json!( {
-                        "message": err.to_string()
-                    }).to_string().into())
+                    .body(
+                        json!( {
+                            "message": err.to_string()
+                        })
+                        .to_string()
+                        .into(),
+                    )
                     .expect("failed to render response"));
             }
 
@@ -106,12 +118,10 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
 
         if let Err(err) = minify_result {
             return Ok(Response::builder()
-                    .status(400)
-                    .header("Content-Type", "application/json")
-                    .body(json!( {
-                        "message": err
-                    }).to_string().into())
-                    .expect("failed to render response"));
+                .status(400)
+                .header("Content-Type", "application/json")
+                .body(json!({ "message": err }).to_string().into())
+                .expect("failed to render response"));
         }
 
         printer_options.minify = request.minify;
@@ -122,26 +132,38 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
             return Ok(Response::builder()
                 .status(400)
                 .header("Content-Type", "application/json")
-                .body(json!( {
-                    "message": err.to_string()
-                }).to_string().into())
+                .body(
+                    json!( {
+                        "message": err.to_string()
+                    })
+                    .to_string()
+                    .into(),
+                )
                 .expect("failed to render response"));
         }
 
         Ok(Response::builder()
             .status(200)
             .header("Content-Type", "application/json")
-            .body(json!( {
-                "compiled": build.unwrap().code,
-            }).to_string().into())
+            .body(
+                json!( {
+                    "compiled": build.unwrap().code,
+                })
+                .to_string()
+                .into(),
+            )
             .expect("failed to render response"))
     } else {
         Ok(Response::builder()
             .status(400)
             .header("Content-Type", "application/json")
-            .body(json!( {
-                "message": body.err().unwrap().to_string()
-            }).to_string().into())
+            .body(
+                json!( {
+                    "message": body.err().unwrap().to_string()
+                })
+                .to_string()
+                .into(),
+            )
             .expect("failed to render response"))
     }
 }
