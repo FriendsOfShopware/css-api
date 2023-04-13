@@ -64,12 +64,12 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
             parser_options
         );
 
-        if stylesheet.is_err() {
+        if let Err(err) = stylesheet {
             return Ok(Response::builder()
                 .status(400)
                 .header("Content-Type", "application/json")
                 .body(json!( {
-                    "message": stylesheet.err().unwrap().to_string()
+                    "message": err.to_string()
                 }).to_string().into())
                 .expect("failed to render response"));
         }
@@ -84,12 +84,12 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
         } else {
             let browser_list = Browsers::from_browserslist([&request.browserlist]);
 
-            if browser_list.is_err() {
+            if let Err(err) = browser_list {
                 return Ok(Response::builder()
                     .status(400)
                     .header("Content-Type", "application/json")
                     .body(json!( {
-                        "message": browser_list.err().unwrap().to_string()
+                        "message": err.to_string()
                     }).to_string().into())
                     .expect("failed to render response"));
             }
@@ -102,18 +102,28 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
 
         let mut stylesheet_unwrapped = stylesheet.unwrap();
 
-        stylesheet_unwrapped.minify(minify_options).unwrap();
+        let minify_result = stylesheet_unwrapped.minify(minify_options);
+
+        if let Err(err) = minify_result {
+            return Ok(Response::builder()
+                    .status(400)
+                    .header("Content-Type", "application/json")
+                    .body(json!( {
+                        "message": err
+                    }).to_string().into())
+                    .expect("failed to render response"));
+        }
 
         printer_options.minify = request.minify;
 
         let build = stylesheet_unwrapped.to_css(printer_options);
 
-        if build.is_err() {
+        if let Err(err) = build {
             return Ok(Response::builder()
                 .status(400)
                 .header("Content-Type", "application/json")
                 .body(json!( {
-                    "message": build.err().unwrap().to_string()
+                    "message": err.to_string()
                 }).to_string().into())
                 .expect("failed to render response"));
         }
