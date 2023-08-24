@@ -7,7 +7,7 @@ edition = "2021"
 lambda_http = { version = "0.8", default-features = false, features = ["apigw_http"] }
 lambda_runtime = "0.8"
 lightningcss = { version = "1.0.0-alpha.44", features = [ "browserslist", "serde" ] }
-serde = "1.0.180"
+serde = "1.0.186"
 serde_json = "1.0.104"
 tokio = { version = "1", features = ["macros"] }
 tracing = { version = "0.1", features = ["log"] }
