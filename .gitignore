@@ -1,7 +1,2 @@
-
-# Devenv
-.devenv*
-.direnv
-devenv.local.nix
-
+/.idea
 /target

@@ -1,6 +1,6 @@
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
-use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
-use lightningcss::targets::Browsers;
+use lightningcss::stylesheet::{MinifyOptions, ParserFlags, ParserOptions, PrinterOptions, StyleSheet};
+use lightningcss::targets::{Browsers, Features, Targets};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -24,9 +24,6 @@ struct TransformRequest {
 
     #[serde(default = "bool_true")]
     custom_media_queries: bool,
-
-    #[serde(default = "bool_true")]
-    css_nesting: bool,
 }
 
 async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
@@ -63,9 +60,14 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
     };
 
     if let Ok(request) = body {
+        let mut flags = ParserFlags::empty();
+        if request.custom_media_queries {
+            flags.set(ParserFlags::CUSTOM_MEDIA, true)
+        }
+
+
         let mut parser_options = ParserOptions::default();
-        parser_options.custom_media = request.custom_media_queries;
-        parser_options.nesting = request.css_nesting;
+        parser_options.flags = flags;
 
         let stylesheet = StyleSheet::parse(&request.stylesheet, parser_options);
 
@@ -87,8 +89,13 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
         let mut printer_options = PrinterOptions::default();
 
         if request.browserlist.is_empty() {
-            printer_options.targets = Some(request.targets);
-            minify_options.targets = Some(request.targets);
+            let targets = Targets {
+                browsers: Some(request.targets),
+                exclude: Features::empty(),
+                include: Features::empty(),
+            };
+            printer_options.targets = targets;
+            minify_options.targets = targets;
         } else {
             let browser_list = Browsers::from_browserslist([&request.browserlist]);
 
@@ -108,8 +115,14 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
 
             let browser_list = browser_list.unwrap();
 
-            printer_options.targets = browser_list;
-            minify_options.targets = browser_list;
+            let targets = Targets {
+                browsers: browser_list,
+                exclude: Features::empty(),
+                include: Features::empty(),
+            };
+
+            printer_options.targets = targets;
+            minify_options.targets = targets;
         }
 
         let mut stylesheet_unwrapped = stylesheet.unwrap();
