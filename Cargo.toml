@@ -6,9 +6,9 @@ edition = "2021"
 [dependencies]
 lambda_http = { version = "0.13", default-features = false, features = ["apigw_http"] }
 lambda_runtime = "0.13"
-lightningcss = { version = "1.0.0-alpha.60", features = [ "browserslist", "serde" ] }
+lightningcss = { version = "1.0.0-alpha.61", features = [ "browserslist", "serde" ] }
 serde = "1.0.215"
-serde_json = "1.0.132"
+serde_json = "1.0.133"
 tokio = { version = "1", features = ["macros"] }
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
